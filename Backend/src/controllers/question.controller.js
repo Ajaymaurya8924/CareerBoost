@@ -46,6 +46,34 @@ const addQuestion = async (req, res) => {
   }
 };
 
+// Get Questions By Company & Type
+const getQuestions = async (req, res) => {
+  try {
+
+    const { companyId, type } = req.params;
+
+    const questions = await Question.find({
+      company: companyId,
+      type: type,
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: questions.length,
+      questions,
+    });
+
+  } catch (error) {
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
+
 module.exports = {
   addQuestion,
+  getQuestions
 };
