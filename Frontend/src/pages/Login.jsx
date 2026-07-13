@@ -1,9 +1,9 @@
-function Login() {
+import React from 'react'
+
+const Login = () => {
   return (
-    <h1 className="text-4xl font-bold text-center mt-20">
-      Login Page
-    </h1>
-  );
+    <div>Login</div>
+  )
 }
 
-export default Login;
+export default Login

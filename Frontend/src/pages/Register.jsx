@@ -1,9 +1,9 @@
-function Register() {
+import React from 'react'
+
+const Register = () => {
   return (
-    <h1 className="text-4xl font-bold text-center mt-20">
-      Register Page
-    </h1>
-  );
+    <div>Register</div>
+  )
 }
 
-export default Register;
+export default Register
