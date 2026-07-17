@@ -1,20 +1,21 @@
 import { Search, ArrowRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
-
 
 function Home() {
 
     const [companies, setCompanies] = useState([]);
-
     const [loading, setLoading] = useState(true);
+
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         fetchCompanies();
     }, []);
 
     const fetchCompanies = async () => {
+
         try {
 
             const res = await api.get("/company/all");
@@ -30,16 +31,31 @@ function Home() {
             setLoading(false);
 
         }
+
     };
+
+    const filteredCompanies = useMemo(() => {
+
+        return companies.filter((company) =>
+            company.companyName
+                .toLowerCase()
+                .includes(search.toLowerCase())
+        );
+
+    }, [companies, search]);
+
     return (
+
         <div className="bg-slate-50">
 
             {/* Hero Section */}
+
             <section className="max-w-7xl mx-auto px-6 py-20">
 
                 <div className="grid lg:grid-cols-2 gap-14 items-center">
 
                     {/* Left */}
+
                     <div>
 
                         <span className="bg-blue-100 text-blue-600 px-4 py-2 rounded-full text-sm font-semibold">
@@ -48,7 +64,9 @@ function Home() {
 
                         <h1 className="text-6xl font-bold mt-8 leading-tight text-slate-900">
                             Crack Your
-                            <span className="text-blue-600"> Dream Placement </span>
+                            <span className="text-blue-600">
+                                {" "}Dream Placement{" "}
+                            </span>
                             With Confidence.
                         </h1>
 
@@ -67,11 +85,15 @@ function Home() {
                             <input
                                 type="text"
                                 placeholder="Search Company..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
                                 className="flex-1 px-4 py-5 outline-none"
                             />
 
-                            <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-5">
-                                Search
+                            <button
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-5"
+                            >
+                                {filteredCompanies.length}
                             </button>
 
                         </div>
@@ -148,7 +170,7 @@ function Home() {
 
             </section>
 
-            {/* Trusted Companies */}
+                        {/* Trusted Companies */}
 
             <section className="bg-white py-16">
 
@@ -168,12 +190,14 @@ function Home() {
                             "Amazon",
                             "Google",
                         ].map((company) => (
+
                             <div
                                 key={company}
                                 className="bg-slate-100 hover:bg-blue-600 hover:text-white transition rounded-xl p-6 text-center font-semibold shadow"
                             >
                                 {company}
                             </div>
+
                         ))}
 
                     </div>
@@ -182,7 +206,7 @@ function Home() {
 
             </section>
 
-            {/* Features Section */}
+            {/* Features */}
 
             <section className="py-20 bg-slate-50">
 
@@ -260,7 +284,6 @@ function Home() {
 
             </section>
 
-
             {/* Statistics */}
 
             <section className="bg-blue-600 py-20 text-white">
@@ -268,16 +291,19 @@ function Home() {
                 <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-10 text-center px-6">
 
                     <div>
+
                         <h2 className="text-5xl font-bold">
-                            100+
+                            {companies.length}+
                         </h2>
 
                         <p className="mt-3 text-lg">
                             Companies
                         </p>
+
                     </div>
 
                     <div>
+
                         <h2 className="text-5xl font-bold">
                             5000+
                         </h2>
@@ -285,9 +311,11 @@ function Home() {
                         <p className="mt-3 text-lg">
                             Questions
                         </p>
+
                     </div>
 
                     <div>
+
                         <h2 className="text-5xl font-bold">
                             1000+
                         </h2>
@@ -295,9 +323,11 @@ function Home() {
                         <p className="mt-3 text-lg">
                             Students
                         </p>
+
                     </div>
 
                     <div>
+
                         <h2 className="text-5xl font-bold">
                             95%
                         </h2>
@@ -305,53 +335,90 @@ function Home() {
                         <p className="mt-3 text-lg">
                             Success Rate
                         </p>
+
                     </div>
 
                 </div>
 
             </section>
 
+                        {/* Latest Companies */}
+
             <section className="py-20 bg-slate-100">
 
                 <div className="max-w-7xl mx-auto px-6">
 
-                    <h2 className="text-4xl font-bold text-center mb-12">
+                    <h2 className="text-4xl font-bold text-center mb-4">
                         Latest Companies
                     </h2>
 
+                    <p className="text-center text-gray-500 mb-10">
+                        {filteredCompanies.length} Companies Found
+                    </p>
+
                     {
-                        loading ?
+                        loading ? (
 
                             <p className="text-center text-xl">
                                 Loading...
                             </p>
 
-                            :
+                        ) : filteredCompanies.length === 0 ? (
+
+                            <div className="bg-white rounded-2xl shadow-lg p-10 text-center">
+
+                                <h2 className="text-3xl font-bold">
+                                    No Company Found 😔
+                                </h2>
+
+                                <p className="text-gray-500 mt-4">
+                                    Try another company name.
+                                </p>
+
+                            </div>
+
+                        ) : (
 
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-                                {companies.map((company) => (
+                                {filteredCompanies.map((company) => (
 
                                     <div
                                         key={company._id}
-                                        className="bg-white rounded-2xl shadow-lg p-6"
+                                        className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition duration-300"
                                     >
+
+                                        {
+                                            company.logo && (
+
+                                                <img
+                                                    src={company.logo}
+                                                    alt={company.companyName}
+                                                    className="w-16 h-16 object-contain mb-4"
+                                                />
+
+                                            )
+                                        }
 
                                         <h2 className="text-2xl font-bold">
                                             {company.companyName}
                                         </h2>
 
                                         <p className="text-gray-600 mt-3">
-                                            {company.package}
+                                            💰 {company.package}
                                         </p>
 
-                                        <p className="text-gray-600">
-                                            {company.location}
+                                        <p className="text-gray-600 mt-2">
+                                            📍 {company.location}
+                                        </p>
+
+                                        <p className="text-gray-500 mt-4 line-clamp-3">
+                                            {company.description}
                                         </p>
 
                                         <Link
                                             to={`/company/${company._id}`}
-                                            className="inline-block mt-5 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
+                                            className="inline-block mt-6 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition"
                                         >
                                             View Details
                                         </Link>
@@ -362,14 +429,46 @@ function Home() {
 
                             </div>
 
+                        )
+
                     }
 
                 </div>
 
             </section>
 
+            {/* Footer */}
+
+            <footer className="bg-slate-900 text-white py-10">
+
+                <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+
+                    <div>
+
+                        <h2 className="text-3xl font-bold">
+                            🚀 CareerBoost
+                        </h2>
+
+                        <p className="text-gray-400 mt-3">
+                            Placement Preparation Portal built using MERN Stack.
+                        </p>
+
+                    </div>
+
+                    <div className="mt-6 md:mt-0 text-gray-400">
+
+                        © {new Date().getFullYear()} CareerBoost. All Rights Reserved.
+
+                    </div>
+
+                </div>
+
+            </footer>
+
         </div>
+
     );
+
 }
 
 export default Home;

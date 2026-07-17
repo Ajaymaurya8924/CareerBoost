@@ -35,10 +35,12 @@ function Navbar() {
           {user && (
             <>
               <Link
-                to="/dashboard"
+                to={user.role === "admin" ? "/admin/dashboard" : "/dashboard"}
                 className="hover:text-blue-600 transition"
               >
-                Dashboard
+                {user.role === "admin"
+                  ? "Admin Dashboard"
+                  : "Dashboard"}
               </Link>
 
               <Link

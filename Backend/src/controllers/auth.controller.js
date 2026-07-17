@@ -5,7 +5,8 @@ const jwt = require("jsonwebtoken");
 
 const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+
+    const { name, email, password, role } = req.body;
 
     // Validation
     if (!name || !email || !password) {
@@ -15,7 +16,7 @@ const register = async (req, res) => {
       });
     }
 
-    // User already exists
+    // Check Existing User
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -25,17 +26,18 @@ const register = async (req, res) => {
       });
     }
 
-    // Password Hash
+    // Hash Password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Save User
+    // Create User
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
+      role: role || "student",
     });
 
-    // Password response me nahi bhejna
+    // Hide Password
     user.password = undefined;
 
     return res.status(201).json({
@@ -149,9 +151,35 @@ const me = async (req, res) => {
 
 };
 
+const getAllStudents = async (req, res) => {
+
+    try {
+
+        const students = await User.find({
+            role: "student"
+        }).select("-password");
+
+        return res.status(200).json({
+            success: true,
+            count: students.length,
+            students
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+
 module.exports = {
     register,
     login,
     logout,
-    me
+    me,
+    getAllStudents
 };

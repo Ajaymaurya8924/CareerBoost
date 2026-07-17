@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import api from "../services/api";
 
 function CompanyDetails() {
@@ -128,6 +128,39 @@ function CompanyDetails() {
                         ))}
 
                     </ul>
+
+                </div>
+
+                <div className="mt-10">
+
+                    <h2 className="text-2xl font-bold mb-5">
+                        Practice Questions
+                    </h2>
+
+                    <div className="flex flex-wrap gap-4">
+
+                        <Link
+                            to={`/questions/${company._id}/technical`}
+                            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+                        >
+                            💻 Technical
+                        </Link>
+
+                        <Link
+                            to={`/questions/${company._id}/aptitude`}
+                            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition"
+                        >
+                            📘 Aptitude
+                        </Link>
+
+                        <Link
+                            to={`/questions/${company._id}/hr`}
+                            className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition"
+                        >
+                            🎤 HR
+                        </Link>
+
+                    </div>
 
                 </div>
 

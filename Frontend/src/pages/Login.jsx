@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
+import { toast } from "react-toastify";
 
 function Login() {
     const { login } = useAuth();
@@ -29,11 +30,22 @@ function Login() {
         try {
             const res = await api.post("/auth/login", formData);
             login(res.data.user);
-            alert(res.data.message);
 
-            navigate("/dashboard");
+            if (res.data.user.role === "admin") {
+                toast.success(res.data.message);
+                navigate("/admin/dashboard");
+
+            } else {
+                toast.success(res.data.message);
+                navigate("/dashboard");
+
+            }
+
         } catch (error) {
-            alert(error.response?.data?.message || "Login Failed");
+            toast.error(
+                error.response?.data?.message ||
+                "Login Failed"
+            );
         } finally {
             setLoading(false);
         }

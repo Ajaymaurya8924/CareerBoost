@@ -1,15 +1,58 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import api from "../services/api";
 
 function Dashboard() {
 
     const { user, loading } = useAuth();
 
-    if (loading) {
+    const [companies, setCompanies] = useState([]);
+    const [questionCount, setQuestionCount] = useState(0);
+
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+
+        fetchDashboardData();
+
+    }, []);
+
+    const fetchDashboardData = async () => {
+
+        try {
+
+            const [companyRes, questionRes] = await Promise.all([
+                api.get("/company/all"),
+                api.get("/question/all"),
+            ]);
+
+            setCompanies(companyRes.data.companies);
+
+            setQuestionCount(questionRes.data.count);
+
+        } catch (error) {
+
+            console.log(error);
+
+        } finally {
+
+            setPageLoading(false);
+
+        }
+
+    };
+
+    if (loading || pageLoading) {
+
         return (
+
             <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
                 Loading...
             </div>
+
         );
+
     }
 
     return (
@@ -20,107 +63,163 @@ function Dashboard() {
 
                 {/* Welcome */}
 
-                <div className="bg-white rounded-2xl shadow-lg p-8">
+                <div className="bg-white rounded-2xl shadow-lg p-8 flex justify-between items-center flex-wrap gap-5">
 
-                    <h1 className="text-4xl font-bold">
-                        Welcome, {user?.name} 👋
-                    </h1>
+                    <div>
 
-                    <p className="text-gray-500 mt-3">
-                        Prepare daily and crack your dream company.
-                    </p>
+                        <h1 className="text-4xl font-bold">
+                            Welcome, {user?.name} 👋
+                        </h1>
+
+                        <p className="text-gray-500 mt-3">
+                            Prepare daily and crack your dream placement.
+                        </p>
+
+                    </div>
+
+                    <div className="flex gap-3">
+
+                        <Link
+                            to="/"
+                            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+                        >
+                            🏠 Home
+                        </Link>
+
+                        <Link
+                            to="/profile"
+                            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
+                        >
+                            👤 Profile
+                        </Link>
+
+                    </div>
 
                 </div>
 
-                {/* Cards */}
+                {/* Statistics */}
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mt-10">
 
-                    <div className="bg-white shadow-lg rounded-2xl p-8">
+                    <div className="bg-white rounded-2xl shadow-lg p-8">
 
                         <h2 className="text-5xl">
                             🏢
                         </h2>
 
-                        <h3 className="text-2xl font-bold mt-5">
+                        <h3 className="text-2xl font-bold mt-4">
                             Companies
                         </h3>
 
-                        <p className="text-gray-500 mt-2">
-                            100+
+                        <p className="text-4xl font-bold text-blue-600 mt-4">
+                            {companies.length}
                         </p>
 
                     </div>
 
-                    <div className="bg-white shadow-lg rounded-2xl p-8">
+                    <div className="bg-white rounded-2xl shadow-lg p-8">
 
                         <h2 className="text-5xl">
-                            💻
+                            ❓
                         </h2>
 
-                        <h3 className="text-2xl font-bold mt-5">
-                            Technical
+                        <h3 className="text-2xl font-bold mt-4">
+                            Questions
                         </h3>
 
-                        <p className="text-gray-500 mt-2">
-                            3000+
+                        <p className="text-4xl font-bold text-green-600 mt-4">
+                            {questionCount}
                         </p>
 
                     </div>
 
-                    <div className="bg-white shadow-lg rounded-2xl p-8">
+                    <div className="bg-white rounded-2xl shadow-lg p-8">
 
                         <h2 className="text-5xl">
-                            🎤
+                            👤
                         </h2>
 
-                        <h3 className="text-2xl font-bold mt-5">
-                            HR Questions
+                        <h3 className="text-2xl font-bold mt-4">
+                            User
                         </h3>
 
-                        <p className="text-gray-500 mt-2">
-                            1000+
+                        <p className="text-xl mt-4">
+                            {user?.name}
                         </p>
 
                     </div>
 
-                    <div className="bg-white shadow-lg rounded-2xl p-8">
+                    <div className="bg-white rounded-2xl shadow-lg p-8">
 
                         <h2 className="text-5xl">
-                            📄
+                            📧
                         </h2>
 
-                        <h3 className="text-2xl font-bold mt-5">
-                            Aptitude
+                        <h3 className="text-2xl font-bold mt-4">
+                            Email
                         </h3>
 
-                        <p className="text-gray-500 mt-2">
-                            2000+
+                        <p className="text-sm mt-4 break-all">
+                            {user?.email}
                         </p>
 
                     </div>
 
                 </div>
 
-                {/* Recent Activity */}
+                {/* Latest Companies */}
 
                 <div className="bg-white rounded-2xl shadow-lg p-8 mt-10">
 
-                    <h2 className="text-3xl font-bold mb-6">
-                        Recent Activity
+                    <h2 className="text-3xl font-bold mb-8">
+                        Latest Companies
                     </h2>
 
-                    <ul className="space-y-4 text-gray-700">
+                    {
+                        companies.length === 0 ? (
 
-                        <li>✅ Login Successful</li>
+                            <p>No Companies Available</p>
 
-                        <li>📘 Start solving Aptitude Questions</li>
+                        ) : (
 
-                        <li>💻 Practice Technical Interview Questions</li>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                        <li>🎤 Prepare HR Interview Questions</li>
+                                {
+                                    companies.slice(0, 6).map((company) => (
 
-                    </ul>
+                                        <div
+                                            key={company._id}
+                                            className="border rounded-xl p-5 hover:shadow-lg transition"
+                                        >
+
+                                            <h2 className="text-2xl font-bold">
+                                                {company.companyName}
+                                            </h2>
+
+                                            <p className="text-gray-500 mt-3">
+                                                {company.package}
+                                            </p>
+
+                                            <p className="text-gray-500">
+                                                {company.location}
+                                            </p>
+
+                                            <Link
+                                                to={`/company/${company._id}`}
+                                                className="inline-block mt-5 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
+                                            >
+                                                View Details
+                                            </Link>
+
+                                        </div>
+
+                                    ))
+                                }
+
+                            </div>
+
+                        )
+                    }
 
                 </div>
 
@@ -129,6 +228,7 @@ function Dashboard() {
         </div>
 
     );
+
 }
 
 export default Dashboard;
